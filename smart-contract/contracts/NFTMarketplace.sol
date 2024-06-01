@@ -51,7 +51,7 @@ using Counters for Counters.Counter;
     }
 
    function getListingPrice() public view returns (uint256) {
-     return listingPrice
+     return listingPrice;
    }
 
   //  "Create nft function"
@@ -64,7 +64,7 @@ using Counters for Counters.Counter;
     _mint(msg.sender, newTokenId);
     _setTokenURI(newTokenId, tokenURI);
 
-    createMarketItem(newTokenId, Price);
+    createMarketItem(newTokenId, price);
 
     return newTokenId;
   }
@@ -73,7 +73,7 @@ using Counters for Counters.Counter;
   
   function createMarketItem(uint256 tokenId, uint256 price) private {
     require(price > 0, "Price must be at least 1");
-    require(msg.value == listingPrice, "Price must me listing price")
+    require(msg.value == listingPrice, "Price must me listing price");
 
     idMarketItem[tokenId] = MarketItem(
         tokenId,
@@ -81,7 +81,7 @@ using Counters for Counters.Counter;
         payable(address(this)),
         price,
         false
-    )
+    );
     _transfer(msg.sender, address(this), tokenId);
 
     emit idMarketItemCreated(tokenId, msg.sender, address(this), price, false);
@@ -116,11 +116,36 @@ using Counters for Counters.Counter;
 
     _transfer(address(this), msg.sender, tokenId);
 
-    payable(owner)._transfer(listingPrice);
-    payable(idMarketItem[tokenId].seller).transfer(msg.value)
+    payable(owner).transfer(listingPrice);
+    payable(idMarketItem[tokenId].seller).transfer(msg.value);
   }
   
   //getting unsold nft data 
+  function fetchMarketItem() public view returns(MarketItem[] memory) {
+    uint256 itemCount = _tokenIds.current();
+    uint256 unSoldItemCount = _tokenIds.current() - _itemsSold.current();
+    uint256 currentIndex = 0;
+
+    MarketItem[] memory items = new MarketItem[](unSoldItemCount);
+    for(uint256 i = 0; i < itemCount; i++) {
+      if(idMarketItem[i + 1].owner == address(this)) {
+          uint256  currentId = i + 1;
+
+          MarketItem storage currentItem = idMarketItem[currentId];
+          items[currentIndex] = currentItem;
+          currentIndex += 1;
+      }
+    }
+    return items;
+  }
+
+  //Single user items
+
+  function fetchItemsListed() public view returns (MarketItem[] memory) {
+    uint256 totalCount = _tokenIds.current();
+    uint256 itemCount = 0;
+    uint currentIndex = 0;
+  }
 
 
 }
