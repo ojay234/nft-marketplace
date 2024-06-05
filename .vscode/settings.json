@@ -1,5 +1,6 @@
 {
     "solidity.solhintRules": {
         
-    }
+    },
+    "editor.fontSize": 14
 }
